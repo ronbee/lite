@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+rvm use 2.0.0@lite --create
+if ! command -v bundle ; then
+      gem install bundler
+fi
+
+# Setting up lite environment
+LITE_ENV=development
+
+if [ "`(hostname --fqdn|grep ec2) 2> /dev/null`" != "" ];then 
+  LITE_ENV="amazon"
+fi
+export LITE_ENV
+
+$rvm_path/scripts/color green
+echo "LITE_ENV => ${LITE_ENV}"
+$rvm_path/scripts/color reset
+
+
