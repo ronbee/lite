@@ -8,8 +8,7 @@ module Cluster
       @perms = Hash.new
     end
   
-    def digest!( arg )
-      word_seq_array = arg.first
+    def digest!( word_seq_array )
       (0..word_seq_array.size-1).each do |i|
         w = word_seq_array[i]
         @word[ w ] ||= 0
@@ -24,8 +23,11 @@ module Cluster
       end
     end
   
+    def extract
+      calculate_ngrams()[ :w ].sort{|x1,x2| x2.last <=> x1.last}
+    end
   
-    def deep_traverse( depth=3, cutoffs=[10,3,2] )    
+    def calculate_ngrams( depth=3, cutoffs=[10,3,2] )    
       a = { :w => @word.delete_if{|key, value| value <= cutoffs.first } , :wb => @word_bigram } #{  :w=>{}, :wb=>{} }
       depth.times do |i|
         cutoff = cutoffs[ i ]
