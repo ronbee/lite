@@ -27,7 +27,7 @@ module Cluster
       calculate_ngrams()[ :w ].sort{|x1,x2| x2.last <=> x1.last}
     end
   
-    def calculate_ngrams( depth=3, cutoffs=[10,3,2] )    
+    def calculate_ngrams( depth=5, cutoffs=[2,2,1,1,1] )    
       a = { :w => @word.delete_if{|key, value| value <= cutoffs.first } , :wb => @word_bigram } #{  :w=>{}, :wb=>{} }
       depth.times do |i|
         cutoff = cutoffs[ i ]
