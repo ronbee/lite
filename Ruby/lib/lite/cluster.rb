@@ -8,14 +8,16 @@ module Cluster
     end
 
     def observe!( instance )
+      u = SparseVector.new instance
+
       if @centroids.size == 0
-        @centroids << Centroid.new( instance )
+        @centroids << Centroid.new( u )
         return self
       end
 
-      @centroids.sort! {|c1, c2|   instance.dist(c1.x) <=> instance.dist(c2.x) }
+      @centroids.sort! {|c1, c2|  u.dist(c1.x) <=> u.dist(c2.x) }
       closest_centroid = @centroids.first
-      closest_centroid.update!( instance )
+      closest_centroid.update!( u )
 
       if( @centroids.size >= @k_max ) 
         pairs = [] 
@@ -35,15 +37,14 @@ module Cluster
         @centroids[merge_info[1]].merge!( @centroids[merge_info[2]] )
         @centroids = @centroids - [ @centroids[merge_info[2]] ]
       end
-      @centroids << Centroid.new( instance )
+      @centroids << Centroid.new( u )
       
       []
     end
 
-    def getCentroids( min_num_instances_in_cluster = 2 )      
+    def centroids( min_num_instances_in_cluster = 2 )      
       @centroids.each do |c|        
         next if c.n >= min_num_instances_in_cluster
-        p c
         @centroids = @centroids - [ c ]      
         next if c.n == 0
         aux = @centroids.inject( {:min_c => @centroids.first, :d => @centroids.first.x.dist( c.x )} ) {|a,cc| cc.nil? || cc.x.dist(c.x) > a[:d] ? a : { :min_c=>cc, :d=>cc.x.dist(c.x)} }        
@@ -53,15 +54,15 @@ module Cluster
     end
   end
 
-  class Centroid < SparseVector
-    attr_accessor :x,:n
+  class Centroid
+    attr_accessor :n,:x
     def initialize( x )
       @x = x
-      @n = 0
+      @n = 1
     end
 
     def update!( newX )
-      @x += ( @x - newX ).mult_scalar( 1.0/(@n+1) )
+      @x += ( @x.mult_scalar(@n) + newX ).mult_scalar( 1.0/(@n+1) )
       @n +=  1
       self 
     end
@@ -70,6 +71,10 @@ module Cluster
       @x = ( @x.mult_scalar(@n)+centroid.x.mult_scalar(centroid.n) ).mult_scalar( 1.0 / (@n + centroid.n) )
       @n += centroid.n
       self
+    end
+
+    def to_s
+      "Centroid #{x.attr} of #{n} instances"
     end
   end
  
