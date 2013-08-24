@@ -30,7 +30,6 @@ class PPM
   end
 
   def single_pr sym, context
-    p context
     ( context[:v].has_key?( sym ) ? context[:v][sym] : context[:v].size ) /  
       (context[:v].values.inject(:+) + context[:v].size).to_f  
   end
@@ -41,9 +40,9 @@ class PPM
   end
 
   def self.load json
-    model = JSON.parse json
+    model = JSON.parse( json, :symbolize_names => true)
     ppm = PPM.new( model[:ab],model[:d] )
-    ppm.trie = model[:trie]
+    ppm.instance_variable_set( :@trie, Trie.new( model[:trie] ) )
     ppm
   end
 end
