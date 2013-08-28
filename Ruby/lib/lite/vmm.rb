@@ -41,7 +41,7 @@ class PPM
   end
 
   def self.from_file file_path
-    model = MessagePack.unpack( File.new( file_path,"r").readlines.join )
+    model = MessagePack.unpack( File.new( file_path,"rb").readlines.join )
     ppm = PPM.new( model['ab'],model['d'] )
     ppm.instance_variable_set( :@trie, Trie.new( model['trie'] ) )
     ppm
