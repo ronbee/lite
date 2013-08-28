@@ -1,5 +1,8 @@
 source "http://rubygems.org"
 
+gem 'oj'
+gem 'msgpack'
+
 group :development do
   gem 'minitest'
 end
