@@ -33,8 +33,19 @@ class PPM
       (context[1].values.inject(:+) + context[1].size).to_f  
   end
 
+  def serialize 
+    { 'trie' => @trie.root, 'ab' => @ab.sym_arr, 'd' => @d }.to_msgpack
+  end
+
+  def self.deserialize serialization_str
+    model = MessagePack.unpack( serialization_str )
+    ppm = PPM.new( model['ab'],model['d'] )
+    ppm.instance_variable_set( :@trie, Trie.new( model['trie'] ) )
+    ppm
+  end
+  
   def to_file file_path 
-    msg = { 'trie' => @trie.root, 'ab' => @ab.sym_arr, 'd' => @d }.to_msgpack
+    msg = serialize
     out = File.new( file_path, "w" )
     out.print msg
     out.close

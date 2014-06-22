@@ -17,4 +17,15 @@ class TestVMM < MiniTest::Unit::TestCase
     pivot_score = -vmm.log_eval( pivot )/pivot.size
     @test_data.each{|x| assert( ( - vmm.log_eval(x)/x.size ) > pivot_score ) }
   end
+
+
+  def test_serialization
+    vmm = Lite::PPM.new( ('a'..'z').to_a + ('0'..'9').to_a+[".","~","/",":","#",",","?","!",";","\""],5 )
+    pivot = @training[0..100].join(' ')
+    @training[101..@training.size].each{|x| vmm.learn x }
+
+    vmm2 = Lite::PPM.deserialize( vmm.serialize )
+    @test_data.each{|x| assert( ( - vmm.log_eval(x) ) ==  ( - vmm2.log_eval(x) )) }
+  end
+
 end
